@@ -1,10 +1,14 @@
 package com.zht.springframework;
 
+import com.zht.springframework.aop.aspectj.AspectJExpressionPointcut;
 import com.zht.springframework.beans.factory.support.DefaultListableBeanFactory;
 import com.zht.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import com.zht.springframework.context.support.ClassPathXmlApplicationContext;
 import com.zht.springframework.event.CustomEvent;
 import org.junit.jupiter.api.Test;
+import java.lang.reflect.Method;
+
+
 
 
 class SpringframeworkApplicationTests {
@@ -41,9 +45,9 @@ class SpringframeworkApplicationTests {
         String result = userService.queryUserInfo();
         System.out.println("测试结果：" + result);
 
-        System.out.println("ApplicationContextAware："+userService.getApplicationContext());
-        System.out.println("BeanFactoryAware："+userService.getBeanFactory());    }
-
+        //System.out.println("ApplicationContextAware："+userService.getApplicationContext());
+        //System.out.println("BeanFactoryAware："+userService.getBeanFactory());    }
+    }
     @Test
     public void test_prototype() {
         // 1.初始化 BeanFactory
@@ -80,6 +84,16 @@ class SpringframeworkApplicationTests {
         applicationContext.publishEvent(new CustomEvent(applicationContext, 1019129009086763L, "成功了！"));
 
         applicationContext.registerShutdownHook();
+    }
+
+    @Test
+    public void test_aop() throws NoSuchMethodException {
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* com.zht.springframework.UserService.*(..))");
+        Class<UserService> clazz = UserService.class;
+        Method method = clazz.getDeclaredMethod("queryUserInfo");
+        System.out.println(pointcut.matches(clazz));
+        System.out.println(pointcut.matches(method , clazz));
+
     }
 
 }
