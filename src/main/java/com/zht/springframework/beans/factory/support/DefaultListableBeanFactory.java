@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-// 底层实现类，最终落地的 ==>启动顺序：最终落地的bean工厂new一个自身A==>向A中注册类信息==>在A中取bean对象（getBean由父类实现） ### 其实完全可以写在一个类里，是设计模式让他们分开
+ // 底层实现类，最终落地的 ==>启动顺序：最终落地的bean工厂 new一个自身A ==> 向A中注册类信息==> 在A中取bean对象（getBean由父类实现） ### 其实完全可以写在一个类里，是设计模式让他们分开
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements  BeanDefinitionRegistry , ConfigurableListableBeanFactory {
 
     // BeanDefinition定义的容器， 其实本类还有单例容器，通过继承获得
@@ -24,7 +24,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     public BeanDefinition getBeanDefinition(String beanName) {
         BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
         if (beanDefinition == null) {
-            System.out.println("没有");
+            System.out.println("没有 beanDefinition");
             return null;
         }
         return beanDefinition;
@@ -40,7 +40,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         Map<String, T> result = new HashMap<>();
         beanDefinitionMap.forEach((beanName, beanDefinition) -> {
             Class beanClass = beanDefinition.getBeanClass();
-            /* */if (type.isAssignableFrom(beanClass)) {
+            /*
+                isAssignableFrom  这个方法用于检查一个类是否是另一个类的子类或者接口的实现类。
+             */
+            if (type.isAssignableFrom(beanClass)) {
                 result.put(beanName, (T) getBean(beanName));
             }
         });

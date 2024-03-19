@@ -5,14 +5,14 @@ import cn.hutool.core.util.StrUtil;
 import com.zht.springframework.beans.PropertyValue;
 import com.zht.springframework.beans.PropertyValues;
 import com.zht.springframework.beans.factory.*;
-import com.zht.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import com.zht.springframework.beans.factory.config.BeanDefinition;
-import com.zht.springframework.beans.factory.config.BeanPostProcessor;
-import com.zht.springframework.beans.factory.config.BeanReference;
+import com.zht.springframework.beans.factory.config.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-public class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
+public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
+
+
     //自定义对象，功能为封装java反射机制并创建对象
     private InstantiationStrategy instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 
@@ -20,7 +20,14 @@ public class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory impl
     @Override
     protected Object createBean(String beanName, BeanDefinition beanDefinition ,Object args[]) {
         Object bean = null;
+
         try{
+            // 提前判断是否代理
+            bean = resolveBeforeInstantiation(beanName, beanDefinition);
+            if (null != bean) {
+                return bean;
+            }
+            // 进入bean的生命周期
             //创建分两步：1类信息new对象（分配地址） 2对象填充（地址填值）
             //step1:
             bean = createBeanInstance(beanDefinition, beanName, args);
@@ -35,6 +42,7 @@ public class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory impl
 
         // 注册实现了 DisposableBean 接口的 Bean 对象
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
+
         //bean创建完毕，由于该工厂分支为单例路线，所以把bean填充到单例容器中
 
         if (beanDefinition.isSingleton()) {
@@ -45,11 +53,31 @@ public class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory impl
 
 
     protected void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
+        if (!beanDefinition.isSingleton()) return;
         if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestoryMethodName())) {
             registerDisposableBean(beanName, new DisposableBeanAdapter(bean, beanName, beanDefinition));
         }
     }
 
+    // Aop第一步
+    protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
+        Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        if (null != bean) {
+            bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+        }
+        return bean;
+    }
+
+    //Aop第二步
+    protected Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                Object result = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);
+                if (null != result) return result;
+            }
+        }
+        return null;
+    }
 
     private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
         // 感知
@@ -79,7 +107,7 @@ public class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory impl
         }
 
         // 3. 执行 BeanPostProcessor After 处理
-        wrappedBean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+        wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
         return wrappedBean;
     }
 
@@ -133,10 +161,7 @@ public class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory impl
 
 
 
-    @Override
-    protected BeanDefinition getBeanDefinition(String beanName) {
-        return null;
-    }
+
 
 
     private void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition) throws Exception {
@@ -174,4 +199,6 @@ public class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory impl
         }
         return result;
     }
+
+
 }

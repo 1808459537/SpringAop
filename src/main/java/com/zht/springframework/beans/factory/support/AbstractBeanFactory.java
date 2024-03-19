@@ -9,8 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractBeanFactory extends  FactoryBeanRegistrySupport implements ConfigurableBeanFactory {
+
     private ClassLoader classLoader = ClassUtils.getDefaultClassLoader();
+
     private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
+
 
     public ClassLoader getBeanClassLoader(){
         return classLoader;
@@ -47,9 +50,10 @@ public abstract class AbstractBeanFactory extends  FactoryBeanRegistrySupport im
     protected  <T>T  doGetBean(String name, Object[] args){
         Object sharedInstance = getSingleton(name);
         if(sharedInstance != null){
-            return (T) getObjectForBeanInstance(sharedInstance, name); // 让bean过一下该方法，判断是不是某个接口的实例
+            return (T) getObjectForBeanInstance(sharedInstance, name); // 让bean过一下该方法，判断是不是该接口的实例
         }
         BeanDefinition beanDefinition = getBeanDefinition(name);
+
         Object bean = createBean(name, beanDefinition, args);
         return (T) getObjectForBeanInstance(bean, name);
     }

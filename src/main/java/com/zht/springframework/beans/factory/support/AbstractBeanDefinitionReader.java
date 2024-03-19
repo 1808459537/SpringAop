@@ -6,7 +6,7 @@ import com.zht.springframework.core.io.ResourceLoader;
 
 
 
-public class AbstractBeanDefinitionReader implements BeanDefinitionReader {
+public abstract class AbstractBeanDefinitionReader implements BeanDefinitionReader {
     private final BeanDefinitionRegistry registry;
     private  ResourceLoader resourceLoader;
 
@@ -29,23 +29,4 @@ public class AbstractBeanDefinitionReader implements BeanDefinitionReader {
         return resourceLoader;
     }
 
-    @Override
-    public void loadBeanDefinitions(Resource resource) {
-
-    }
-
-    @Override
-    public void loadBeanDedinitions(Resource... resources) {
-
-    }
-
-    @Override
-    public void loadBeanDefinitions(String location) {
-
-    }
-
-    @Override
-    public void loadBeanDefinitions(String... locations) {
-
-    }
 }
