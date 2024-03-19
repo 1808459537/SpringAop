@@ -3,11 +3,13 @@ package com.zht.springframework;
 import com.zht.springframework.beans.factory.*;
 import com.zht.springframework.context.ApplicationContext;
 import com.zht.springframework.context.ApplicationContextAware;
+import com.zht.springframework.stereotype.Component;
 
 import java.util.Random;
 
-public class UserService implements IUserService{
-
+@Component("userService")
+public class    UserService implements IUserService{
+    private String token;
 
     public String queryUserInfo() {
         try {
@@ -27,8 +29,19 @@ public class UserService implements IUserService{
         return "注册用户：" + userName + " success！";
     }
 
+    @Override
+    public String toString() {
+        return "UserService#token = { " + token + " }";
+    }
+    public String getToken() {
+        return token;
+    }
 
-//   private ApplicationContext applicationContext;
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    //   private ApplicationContext applicationContext;
 //    private BeanFactory beanFactory;
 //
 //
