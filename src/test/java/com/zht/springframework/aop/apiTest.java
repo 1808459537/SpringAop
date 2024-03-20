@@ -31,6 +31,7 @@ public class apiTest {
         System.out.println("测试结果：" + proxy_jdk.register("花花"));
     }
 
+
     @Test
     public void test_aop() {
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:springAop.xml");
@@ -49,6 +50,13 @@ public class apiTest {
     @Test
     public void test_scan() {
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring-scan.xml");
+        IUserService userService = applicationContext.getBean("userService", IUserService.class);
+        System.out.println("测试结果：" + userService.queryUserInfo());
+    }
+
+    @Test
+    public void test_scanV2() {
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
         IUserService userService = applicationContext.getBean("userService", IUserService.class);
         System.out.println("测试结果：" + userService.queryUserInfo());
     }

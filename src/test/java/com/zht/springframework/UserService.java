@@ -1,6 +1,8 @@
 package com.zht.springframework;
 
 import com.zht.springframework.beans.factory.*;
+import com.zht.springframework.beans.factory.annotation.Autowired;
+import com.zht.springframework.beans.factory.annotation.Value;
 import com.zht.springframework.context.ApplicationContext;
 import com.zht.springframework.context.ApplicationContextAware;
 import com.zht.springframework.stereotype.Component;
@@ -9,7 +11,11 @@ import java.util.Random;
 
 @Component("userService")
 public class    UserService implements IUserService{
+    @Value("${token}")
     private String token;
+
+    @Autowired
+    private UserDao userDao;
 
     public String queryUserInfo() {
         try {
@@ -17,22 +23,14 @@ public class    UserService implements IUserService{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return "张三，100001，深圳";
-    }
-
-    public String register(String userName) {
-        try {
-            Thread.sleep(new Random(1).nextInt(100));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return "注册用户：" + userName + " success！";
+        return userDao.queryUserName("10001") + "，" + token;
     }
 
     @Override
-    public String toString() {
-        return "UserService#token = { " + token + " }";
+    public String register(String userName) {
+        return null;
     }
+
     public String getToken() {
         return token;
     }

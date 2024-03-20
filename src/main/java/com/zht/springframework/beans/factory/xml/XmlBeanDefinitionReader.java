@@ -17,6 +17,8 @@ import java.util.List;
 
 // 真实的落地类
 public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
+
+
     // 入参是一个容器，真正干活的工厂又继承了这个容器，就可以把注册这个过程迁移到这个类里
     public XmlBeanDefinitionReader(BeanDefinitionRegistry registry) {
         super(registry);

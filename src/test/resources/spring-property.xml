@@ -12,5 +12,4 @@
     <bean id="userService" class="com.zht.springframework.UserService">
         <property name="token" value="${token}"/>
     </bean>
-
 </beans>
